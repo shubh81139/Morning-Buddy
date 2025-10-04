@@ -28,11 +28,11 @@ This saves time, enhances productivity, and supports better **data-driven decisi
 ---
 
 ### 🚀 Key Features
-- 📰 **Automated Daily Briefing:** Consolidates news, weather, and optional financial data each morning.  
-- 🔔 **Personalized Alerts:** Displays reminders and motivational messages for productivity.  
-- 🧩 **Modular Code Design:** Separate logic (`application_function.py`) ensures scalability and easy maintenance.  
-- ☁️ **Reproducible Setup:** Includes `requirements.txt` for easy dependency installation and environment setup.  
-- 📊 **Extensible Framework:** Can be extended with APIs for stocks, crypto data, or calendar integration.
+- **Automated Daily Briefing:** Consolidates news, weather, and optional financial data each morning.  
+- **Personalized Alerts:** Displays reminders and motivational messages for productivity.  
+- **Modular Code Design:** Separate logic (`application_function.py`) ensures scalability and easy maintenance.  
+- **Reproducible Setup:** Includes `requirements.txt` for easy dependency installation and environment setup.  
+- **Extensible Framework:** Can be extended with APIs for stocks, crypto data, or calendar integration.
 
 ---
 
