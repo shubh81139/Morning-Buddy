@@ -135,12 +135,9 @@ def schedule_page():
     """Displays the page for viewing the day's schedule."""
     st.header("Your Smart Planner Day")
     city = st.text_input("Enter your city name:")
-    # allow the user to pick a date for the plan (defaults to today)
-    date_selected = st.date_input("Select date:", date.today())
 
     if st.button("Let's Plan"):
         if city:
-            # pass the selected date to smarter_planner as a string
             smart_plan = smarter_planner(city)
             st.subheader(smart_plan)
             st.success("Have a Happy day.")
