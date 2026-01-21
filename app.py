@@ -1,11 +1,11 @@
 import streamlit as st
 from datetime import date
 import random
-from application_functions import temperature_of_city, get_news, news_summarizer, smart_planner
+from application import temperature_of_city , get_news, news_summarizer ,smarter_planner
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="Your Morning Buddy",
+    page_title="Your Morning Buddy", 
     page_icon="☀️",
     layout="centered"
 )
@@ -51,7 +51,7 @@ def home_page():
     st.write("Use the sidebar on the left to get your daily updates!")
 
 def weather_news_page():
-    """Displays the page for getting weather and news by city."""
+    """This page displays the weather and news by city."""
     st.header("Get Weather of the city")
     city = st.text_input("Enter your city name:")
 
@@ -61,7 +61,7 @@ def weather_news_page():
             st.subheader(f"Weather Info: {temperature_output}")
             st.success("Weather fetched successfully ✅")
         else:
-            st.error("Please enter a city name.")
+            st.error("Please enter a valid city name.")
 
 def interest_news_page():
     """Displays the page for getting news by interest."""
@@ -135,9 +135,13 @@ def schedule_page():
     """Displays the page for viewing the day's schedule."""
     st.header("Your Smart Planner Day")
     city = st.text_input("Enter your city name:")
+    # allow the user to pick a date for the plan (defaults to today)
+    date_selected = st.date_input("Select date:", date.today())
+
     if st.button("Let's Plan"):
         if city:
-            smart_plan = smart_planner(city)
+            # pass the selected date to smarter_planner as a string
+            smart_plan = smarter_planner(city)
             st.subheader(smart_plan)
             st.success("Have a Happy day.")
         else:
@@ -160,7 +164,3 @@ elif page_option == "News by Interest":
     interest_news_page()
 elif page_option =="Smart Planner":
     schedule_page()
-
-
-
-
