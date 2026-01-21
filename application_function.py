@@ -1,184 +1,159 @@
-from dotenv import load_dotenv
-import os
-from google import genai
-from google.genai import types
-import requests
 import datetime
+from logging import config
+from dotenv import load_dotenv  
+import os
+import requests
+
+
+
+from google import genai
+from google.genai import types  
 
 load_dotenv()
 
+os.environ["GOOGLE_API_KEY"] = "AIzaSyDp_xqF0ll16AjDNFjqIxqmI_BvjGZ9aYk"
+api_key = os.getenv("GOOGLE_API_KEY")
+if not api_key: 
+    raise ValueError("API key Not Found")    
 
-api_key= os.getenv("GOOGLE_API_KEY")
-if not api_key:
-    raise  ValueError("API key  not found")
+client = genai.Client(api_key = api_key)  
 
-client= genai.Client(api_key=api_key)
-
-
-
-# -- FUNCTION  TO GET TEMPERATURE DATA.
-def get_weather(city: str):
-    """
-    Fetches current weather for a given city using OpenWeather API.
-
-    Args:
-        city (str): City name (e.g., "Dehradun")
-
-    Returns:
-        dict: Weather data in JSON format
-    """
+# Function To Get Weather of a City :
+def get_weather(city:str):
+    """Fetches current weather for a given city using Google GenAI. 
+       By taking the argument city as input which is of type string and 
+       returns the weather details as a string. """
+          
     try:
-        api_key = "d9a72f40830629cee460b8964d7847c9"
-        url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}"
-        response = requests.get(url)
-        response.raise_for_status()
-        return response.json()
+        api_key_we = "4c0264ecf89f3088d2ffa6fd70949b7e"
+        url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key_we}"  
+        response = requests.get(url)    
+        return response.json()  
     except requests.exceptions.RequestException as e:
-        return {"error": str(e)}
+        return {"Error": str(e)}
+    
 
-
-
-# GEMINI CODE TO USE THE FUNCTION CALLING TEMPERATURE.
+# Gemini code to use the function to get the detail of the city.
 def temperature_of_city(city):
-    system_instructions = """
-    You are given weather data in JSON format from the OpenWeather API.
-    Your job is to convert it into a clear, human-friendly weather update.  
-
-    Guidelines:
-    1. Always mention the city and country.
-    2. Convert temperature from Kelvin to Celsius (°C), rounded to 1 decimal.
-    3. Include: current temperature, feels-like temperature, main weather description,
-       humidity, wind speed, and sunrise/sunset times (converted from UNIX timestamp).
-    4. Use natural, conversational language.
-    5. Based on the current conditions, suggest what the person should carry or wear.
-       - If rain/clouds: suggest umbrella/raincoat.
-       - If very hot (>30°C): suggest light cotton clothes, sunglasses, stay hydrated.
-       - If cold (<15°C): suggest warm clothes, jacket.
-       - If windy: suggest windbreaker, secure loose items.
-       - If humid: suggest breathable clothes, water bottle.
-    6. If any field is missing, gracefully ignore it.
-
-    """
+    system_instruction = ''' 
+        You are given weather data in JSON format from the OpenWeather API.
+        Your job is to convert it into a clear, human-friendly weather update.  
+        
+        Guidelines:
+        1. Always mention the city and country.
+        2. Convert temperature from Kelvin to Celsius (°C), rounded to 1 decimal.
+        3. Include: current temperature, feels-like temperature, main weather description,
+            humidity, wind speed, and sunrise/sunset times (converted from UNIX timestamp).
+        4. Use natural, conversational language.
+        5. Based on the current conditions, suggest what the person should carry or wear.
+            - If rain/clouds: suggest umbrella/raincoat.
+            - If very hot (>30°C): suggest light cotton clothes, sunglasses, stay hydrated.
+            - If cold (<15°C): suggest warm clothes, jacket.
+            - If windy: suggest windbreaker, secure loose items.
+            - If humid: suggest breathable clothes, water bottle.
+        6. If any field is missing, gracefully ignore it.
+        '''
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=f"TGenerate a clear, friendly weather report with temperatures in °C, humidity, wind, sunrise/sunset for the {city} and practical suggestions on what to wear or carry.",
-        config=types.GenerateContentConfig(system_instruction=system_instructions,
-                                           tools=[get_weather]
-                                           )
+        model="gemini-3-flash-preview",
+        contents=f"Generate a clear,friendly weather report with temperature in Celsius in °C, humidity, wind, sunrise/sunset for the {city} and practical suggestions on what to wear or carry.",
+        config=types.GenerateContentConfig(system_instruction = system_instruction, tools=[get_weather])
+    )
+    return (response.candidates[0].content.parts[0].text)   
+
+
+# Function To Get News Based on Interest :
+def get_news(topic:str):
+    """Fetches latest news headline using Google GenAI. 
+       By taking the argument topic(technology, sports, health) as input which is of type string and 
+       returns the news details as a string. """
+          
+    try:
+        api_key_news = "3a673b82effd4fc4a65a937cd4324781"
+        url = f"https://newsapi.org/v2/everything?q={topic}&apiKey={api_key_news}&pageSize=5&sortBy=publishedAt" 
+        response = requests.get(url)    
+        return response.json().get("articles", []) 
+    except requests.exceptions.RequestException as e:
+        return {"Error": str(e)}
+
+# Function To Summarize News Article :
+def news_summarizer(url):
+    """Summarizes the news article from the given URL using Google GenAI. 
+       By taking the argument url as input which is of type string and 
+       returns the summarized news details as a string. """
+          
+    system_instruction = ''' 
+        You are given a news article URL.
+        Your job is to read the article and provide a concise summary.
+        
+        Guidelines:
+        1. Summarize the main points of the article in 3-4 sentences.
+        2. Use clear and simple language.
+        3. Avoid personal opinions; stick to facts from the article.
+        4. If the article cannot be accessed, respond with "Article not accessible."
+        '''
+    response = client.models.generate_content(
+        model="gemini-3-flash-preview",
+        contents=f"Summarize the news article from this URL: {url}, don't add sentences like from where the article is , in this article etc .Just give clear and crisp summary.", 
+        config=types.GenerateContentConfig(system_instruction = system_instruction, tools=[get_news])
     )
     return (response.candidates[0].content.parts[0].text)
 
+# Function to get forecast of entire day of a city and place to visit in the city :
 
-# FUNCTION FOR GETTING NEWS OF INTEREST
-def get_news(topic: str):
+def get_forecasted_weather(city:str):
+    """Fetches forecasted weather and the tourist place for a given city using Google GenAI. 
+       By taking the argument city as input which is of type string.
     """
-    Fetches the latest news headlines for a given topic using NewsAPI.
-
-    Args:
-        topic (str): Topic to search news for (e.g., "technology", "sports", "finance")
-
-    Returns:
-        list: A list of news articles (each article is a dict with keys like title, description, url, etc.)
-              If an error occurs, returns a dict with an "error" key.
-    """
+          
     try:
-        api_key = "eed15887b8e641608dfbc2203942317c"
-        url = f"https://newsapi.org/v2/everything?q={topic}&apiKey={api_key}&pageSize=5&sortBy=publishedAt"
-        response = requests.get(url)
-        return response.json().get("articles", [])
-    except requests.exceptions.RequestException as e:
-        return {"error": str(e)}
-
-
-
-
-# FUNCTION TO SUMMARIZE NEWS OF INTEREST
-def news_summarizer(url):
-        response = client.models.generate_content(
-                            model="gemini-2.5-flash",
-                            contents=f"summarize news from the url:- {url}, dont add sentences like from where the articles is ,in this article etc. Just give clear and crisp summary.",
-                        )
-        return response.text
-
-
-
-
-# FUNCTION TO GET WEATHER FORECAST AND PLACES TO VISIT IN DELHI.
-def get_forecasted_weather(city: str):
-    """
-    LLM Tool: Fetches forecasted weather and tourist places to visit in a given city for a specific date.
-
-    Args:
-        city (str): City name (e.g., "Chandigarh")
-        date (str): Date in DD-MM-YYYY format (default: 23-08-2025)
-
-    Returns:
-        str: Weather forecast and tourist places (LLM-friendly text)
-    """
-    try:
-        # Define the grounding tool (Google Search)
         grounding_tool = types.Tool(
-            google_search=types.GoogleSearch()
+            google_search = types.GoogleSearch()
         )
-
-        # Config for content generation
-        config = types.GenerateContentConfig(
-            tools=[grounding_tool]
-        )
-
-        # Query Gemini with both weather + places in one request
+        
+        
+        
         response = client.models.generate_content(
-            model="gemini-2.5-flash-lite",
-            contents=f"""
-            Provide the detailed weather forecast for {city} on {datetime.date.today()}.
-            Then also list the top recommended places to visit in {city} on the same date.
-            Format the response clearly so it can be used by another planning agent.
-            """,
-            config=config,
+            model="gemini-3-flash-preview",
+            contents = f"""Provide a detailed weather for {city} on {datetime.date.today()}.Then also list the top recommended place to visit in the {city}on the same date.
+            Formate the response clearly so it can be used by  another planning agent.""",
+            config = types.GenerateContentConfig(
+                     tools=[grounding_tool]) 
         )
-
-        return response.text
+            
+        
+        return (response.candidates[0].content.parts[0].text)       
 
     except Exception as e:
-        return f"❌ Error fetching weather/places: {e}"
-
-
-
-
-
-#FUNCTIONS TO FIND LOCAL EVENTS.
-def find_local_events(city: str):
+      return {"Error": str(e)}
+    
+abc = get_forecasted_weather("Chandigarh")
+print(abc)   
+    
+    
+# Function to find Loacl Events based on city and date :   
+def find_local_events(city:str):
+    """Fetches local events for a given city using API. 
+       By taking the argument city as input which is of type string.
     """
-    Finds local events for a given city using SerpApi's Google Events API.
-
-    Args:
-        city (str): City name (e.g., "Chandigarh").
-
-    Returns:
-        dict: Events data in JSON format.
-    """
+          
     try:
-        api_key = "d633d7551be2ee78cc963951362dcf36ccf03630d97706748bbf6694ab150599"  # <-- Replace with your key
-
-        # The 'q' parameter is the search query, just like you'd type into Google.
-        url = f"https://serpapi.com/search.json?engine=google_events&q=Events in {city}&api_key={api_key}"
-
-        response = requests.get(url)
-        response.raise_for_status()
-        return response.json()
-
-
+        api_key_events = "d876c17f6728ee40fd525b9a69df3a8ec029313f4cad2292e8988dbd6f353cba"
+        url = f"https://serpapi.com/search.json?engine=google_events&q=Events in {city}&api_key={api_key_events}"
+        response = requests.get(url)    
+        return response.json()    # Because all the data is in the json format  
     except requests.exceptions.RequestException as e:
-        return {"error": str(e)}
-
-
-
-
-# FUNCTION FOR SMART PLANNER
-def smart_planner (city):
-    prompt=f"""
-    You are a smart travel and event planner assistant.
-    Your job is to create a personalized day itinerary for the user in a given {city}.
+        return {"Error": str(e)}
+    
+# FUNCTION TO GET SMARTER PLANNER:
+def smarter_planner(city:str):
+    """Generates a smarter daily schedule for a given city and date using Google GenAI. 
+       By taking the argument city and date as input which is of type string.
+    """
+    # default to today's date when none provided
+    date = datetime.date.today().isoformat()
+        
+    prompt  = f"""You are a smart travel and event planner assistant.
+    Your job is to create a personalized day itinerary for the user in a given {city} on {date}.
 
     You are given:
 
@@ -188,7 +163,6 @@ def smart_planner (city):
 
     List of recommended places to visit in the {city}.
 
-    The user’s available time window for the day.
 
     Instructions:
 
@@ -274,16 +248,15 @@ def smart_planner (city):
     .
 
     ✅ This plan balances sightseeing, food, and entertainment while considering today’s cloudy weather.
-    """
-
-    response= client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
-        config= types.GenerateContentConfig(
-            tools=[find_local_events,get_forecasted_weather]
+    """      
+    response = client.models.generate_content(
+        model="gemini-3-flash-preview",
+        contents = prompt, 
+        config = types.GenerateContentConfig(
+            tools=[find_local_events, get_forecasted_weather(city)]
+            
         )
     )
-
-    return response.candidates[0].content.parts[0].text
-
+    
+    return (response.candidates[0].content.parts[0].text)
 
