@@ -68,7 +68,7 @@ def get_news(topic:str):
        returns the news details as a string. """
           
     try:
-        api_key_news = "3a673b82effd4fc4a65a937cd4324781"
+        api_key_news = "72ffc4b0-55d1-45df-9f9c-067be738a836"
         url = f"https://newsapi.org/v2/everything?q={topic}&apiKey={api_key_news}&pageSize=5&sortBy=publishedAt" 
         response = requests.get(url)    
         return response.json().get("articles", []) 
