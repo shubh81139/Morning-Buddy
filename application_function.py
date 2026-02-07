@@ -4,14 +4,14 @@ from dotenv import load_dotenv
 import os
 import requests
 
-
+from functools import partial
 
 from google import genai
 from google.genai import types  
 
 load_dotenv()
 
-os.environ["GOOGLE_API_KEY"] = "AIzaSyDp_xqF0ll16AjDNFjqIxqmI_BvjGZ9aYk"
+os.environ["GOOGLE_API_KEY"] = "AIzaSyCRQPLhvqPvfYaD5lHOaje0VVQew8LZ76k"
 api_key = os.getenv("GOOGLE_API_KEY")
 if not api_key: 
     raise ValueError("API key Not Found")    
@@ -126,9 +126,6 @@ def get_forecasted_weather(city:str):
     except Exception as e:
       return {"Error": str(e)}
     
-abc = get_forecasted_weather("Chandigarh")
-print(abc)   
-    
     
 # Function to find Loacl Events based on city and date :   
 def find_local_events(city:str):
@@ -151,6 +148,9 @@ def smarter_planner(city:str):
     """
     # default to today's date when none provided
     date = datetime.date.today().isoformat()
+    
+    weather_forecast = get_forecasted_weather(city)
+    events = find_local_events(city)
         
     prompt  = f"""You are a smart travel and event planner assistant.
     Your job is to create a personalized day itinerary for the user in a given {city} on {date}.
@@ -186,7 +186,9 @@ def smarter_planner(city:str):
     Input Example:
 
     Weather Forecast:
-    On Saturday, August 23, 2025, Chandigarh is expected to be cloudy with a maximum temperature ranging from 30°C to 34°C (86°F to 93°F) and a minimum temperature between 25°C and 26°C (77°F to 79°F). There is a 25% to 65% chance of rain during the day and a 40% to 45% chance of rain at night. The humidity is anticipated to be around 82% to 86%.
+    On Saturday, August 23, 2025, Chandigarh is expected to be cloudy with a maximum temperature ranging from 30°C to 34°C (86°F to 93°F) and 
+    a minimum temperature between 25°C and 26°C (77°F to 79°F). There is a 25% to 65% chance of rain during the day and a 40% to 45% chance of rain at night.
+    The humidity is anticipated to be around 82% to 86%.
 
     Places to Visit:
 
@@ -253,10 +255,9 @@ def smarter_planner(city:str):
         model="gemini-3-flash-preview",
         contents = prompt, 
         config = types.GenerateContentConfig(
-            tools=[find_local_events, get_forecasted_weather(city)]
+            tools=[find_local_events,  partial(get_forecasted_weather, city)]
             
         )
     )
     
     return (response.candidates[0].content.parts[0].text)
-
