@@ -25,7 +25,7 @@ def get_weather(city:str):
        returns the weather details as a string. """
           
     try:
-        api_key_we = "72ffc4b0-55d1-45df-9f9c-067be738a836"
+        api_key_we = "1e763287ab379ad10676c727165dc179"
         url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key_we}"  
         response = requests.get(url)    
         return response.json()  
