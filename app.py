@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import date
 import random
-from application import temperature_of_city , get_news, news_summarizer ,smarter_planner
+from application import temperature_of_city , get_news, news_summarizer , smarter_planner
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -14,14 +14,56 @@ st.set_page_config(
 def get_random_quote():
     """Returns a random morning quote."""
     quotes = [
-        "The sun is a daily reminder that we too can rise again from the darkness, that we too can shine our own light.",
-        "Write it on your heart that every day is the best day in the year.",
-        "I get up every morning and it’s going to be a great day. You never know when it’s going to be over, so I refuse to have a bad day.",
-        "Today’s goals: Coffee and kindness. Maybe two coffees, and then kindness.",
-        "An early-morning walk is a blessing for the whole day.",
-        "Morning is an important time of day because how you spend your morning can often tell you what kind of day you are going to have.",
-        "Lose an hour in the morning, and you will spend all day looking for it.",
-        "When you arise in the morning, think of what a precious privilege it is to be alive – to breathe, to think, to enjoy, to love."
+        "When you open your eyes in the morning, remember how powerful it is to have another chance to live, to learn, to grow, to love.",
+        "Each morning you wake is proof that life still believes in you and your journey.",
+        "When the sun rises, let your worries set and your hopes rise higher.",
+        "Every morning is a gentle reminder that you are stronger than yesterday’s struggles.",
+        "As you step into the morning light, carry gratitude in your heart and courage in your mind.",
+        "Waking up each day is life’s way of telling you that your purpose is not yet complete.",
+        "Let the quiet of the morning remind you of the peace you can create within yourself.",
+        "Each sunrise brings a new opportunity to become a better version of who you were yesterday.",
+        "In the morning, take a deep breath and appreciate the simple gift of being alive.",
+        "When you rise in the morning, rise with faith that today holds something beautiful for you.",
+        "Every new morning is a blank page waiting for your story to unfold.",
+        "As the day begins, remind yourself that you have the strength to handle whatever comes.",
+        "Morning light teaches us that darkness is temporary and hope always returns.",
+        "Start your morning with positive thoughts, and watch how your day transforms.",
+        "Each morning is life’s invitation to move forward with renewed energy.",
+        "When you wake up, choose peace over pressure and gratitude over complaints.",
+        "The morning breeze carries new beginnings for those who are willing to embrace them.",
+        "With every sunrise, remember that you are gifted another chance to chase your dreams.",
+        "Morning is a time to reflect on how precious life truly is.",
+        "When you arise, fill your heart with hope and your mind with purpose.",
+        "Every morning gives you a chance to leave yesterday’s worries behind.",
+        "As you welcome the new day, remind yourself of your endless possibilities.",
+        "The beauty of the morning lies in its promise of a fresh start.",
+        "When you open your eyes to the day, open your heart to new opportunities.",
+        "Each morning reminds us that resilience is rewarded with another beginning.",
+        "Start the day believing that something wonderful is about to happen.",
+        "Morning moments of silence often bring the loudest clarity.",
+        "When the sun rises, let your motivation rise with it.",
+        "Every new day begins with the courage to step out of bed.",
+        "Morning teaches us patience, as every great day starts slowly.",
+        "As you greet the morning, greet yourself with kindness and encouragement.",
+        "When you wake up, remember how far you have already come.",
+        "Morning is a reminder that life always offers second chances.",
+        "Each sunrise paints the sky with hope for those who look up.",
+        "When you arise, take a moment to appreciate the gift of time.",
+        "The calm of the morning prepares the mind for the challenges ahead.",
+        "With every new dawn, life whispers that you are capable of greatness.",
+        "Morning is the perfect time to reset your thoughts and refresh your goals.",
+        "When you open your eyes, open them to gratitude and positivity.",
+        "Each morning is a small miracle that deserves a thankful heart.",
+        "Start your day with a smile, and let it guide you through the hours ahead.",
+        "When you rise, rise with determination to make the day meaningful.",
+        "The morning sun reminds us that light always follows darkness.",
+        "Each day begins with the simple but powerful act of waking up.",
+        "Morning is an opportunity to align your heart with your intentions.",
+        "When you wake, remind yourself that today is a gift, not a guarantee.",
+        "The freshness of the morning carries the promise of new achievements.",
+        "As you step into the day, carry hope like a guiding light.",
+        "Every sunrise is life’s way of saying, keep going.",
+        "When you arise in the morning, remember how fortunate you are to experience another day to breathe, to think, to feel, and to love.",
     ]
     return random.choice(quotes)
 
@@ -133,9 +175,9 @@ def interest_news_page():
 
 def schedule_page():
     """Displays the page for viewing the day's schedule."""
-    st.header("Your Smart Planner Day")
+    st.header("Your Smart Planner ")
     city = st.text_input("Enter your city name:")
-
+    print(city)
     if st.button("Let's Plan"):
         if city:
             smart_plan = smarter_planner(city)
